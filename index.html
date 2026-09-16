@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>AeroRad-Studio | 空间辐射环境与粒子能谱分析系统</title>
   <style>
     /* Reset & Base Styles (100% Offline Standalone - No external CDN required) */
@@ -10,6 +10,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
     body {
       background-color: #070B14;
@@ -22,7 +23,7 @@
     }
     
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: #0B0F19; }
     ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: #334155; }
@@ -54,6 +55,7 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
+      flex-shrink: 0;
     }
     .brand-title {
       font-size: 16px;
@@ -65,8 +67,8 @@
       gap: 8px;
     }
     .badge-ver {
-      font-size: 11px;
-      padding: 2px 6px;
+      font-size: 10px;
+      padding: 1px 5px;
       border-radius: 4px;
       background: #083344;
       color: #00F0FF;
@@ -96,8 +98,9 @@
       align-items: center;
       gap: 6px;
       transition: all 0.2s;
+      flex-shrink: 0;
     }
-    .btn-export:hover {
+    .btn-export:hover, .btn-export:active {
       background: #334155;
       border-color: #00F0FF;
       color: #00F0FF;
@@ -113,11 +116,6 @@
       max-width: 1920px;
       margin: 0 auto;
       width: 100%;
-    }
-    @media (max-width: 1100px) {
-      .app-container {
-        grid-template-columns: 1fr;
-      }
     }
 
     /* Glass Cards */
@@ -159,7 +157,7 @@
       transition: all 0.2s;
       line-height: 1.4;
     }
-    .btn-preset:hover {
+    .btn-preset:hover, .btn-preset:active {
       background: #202E44;
       border-color: #00F0FF;
       color: #FFFFFF;
@@ -207,8 +205,8 @@
     }
     .input-range::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: #00F0FF;
       cursor: pointer;
@@ -220,7 +218,7 @@
       border: 1px solid #283548;
       color: #FFFFFF;
       border-radius: 6px;
-      padding: 6px 10px;
+      padding: 7px 10px;
       font-size: 12px;
       outline: none;
     }
@@ -291,11 +289,6 @@
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
     }
-    @media (max-width: 800px) {
-      .stat-bar {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
     .stat-card {
       background: #0F172A;
       border: 1px solid #1E293B;
@@ -342,6 +335,8 @@
       padding: 4px;
       border-radius: 8px;
       border: 1px solid #1E293B;
+      overflow-x: auto;
+      max-width: 100%;
     }
     .btn-tab {
       background: transparent;
@@ -353,8 +348,10 @@
       font-size: 12px;
       font-weight: 600;
       transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
-    .btn-tab:hover {
+    .btn-tab:hover, .btn-tab:active {
       color: #FFFFFF;
     }
     .btn-tab.active {
@@ -368,6 +365,7 @@
       font-size: 12px;
       color: #CBD5E1;
       align-items: center;
+      flex-shrink: 0;
     }
     .toggle-group label {
       display: flex;
@@ -386,6 +384,7 @@
       border: 1px solid #1E293B;
       border-radius: 8px;
       overflow: hidden;
+      touch-action: none;
     }
     #chartCanvas {
       width: 100%;
@@ -399,7 +398,7 @@
       background: rgba(15, 23, 42, 0.95);
       border: 1px solid #00F0FF;
       border-radius: 6px;
-      padding: 8px 12px;
+      padding: 6px 10px;
       font-size: 11px;
       color: #FFFFFF;
       font-family: monospace;
@@ -418,11 +417,12 @@
       font-size: 11px;
       color: #64748B;
       font-family: monospace;
+      gap: 8px;
     }
     .legend-box {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       flex-wrap: wrap;
     }
     .legend-item {
@@ -441,6 +441,7 @@
     .table-container {
       width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       margin-top: 8px;
     }
     table {
@@ -482,6 +483,121 @@
       color: #64748B;
       font-family: monospace;
     }
+
+    /* ======================================================== */
+    /* Mobile & Tablet Responsive Media Queries (手机/平板适配) */
+    /* ======================================================== */
+    @media (max-width: 1100px) {
+      .app-container {
+        grid-template-columns: 1fr;
+        padding: 14px 12px;
+        gap: 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 14px;
+      }
+      .brand-title {
+        font-size: 15px;
+      }
+      .brand-desc {
+        font-size: 10px;
+      }
+      .nav-actions {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .btn-export {
+        padding: 5px 10px;
+        font-size: 11px;
+      }
+      .app-container {
+        padding: 10px 8px;
+        gap: 12px;
+      }
+      .card {
+        padding: 12px;
+        border-radius: 10px;
+      }
+      .stat-bar {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      .stat-card {
+        padding: 10px;
+      }
+      .stat-num {
+        font-size: 16px;
+      }
+      .stat-label {
+        font-size: 10px;
+      }
+      .chart-card {
+        padding: 12px;
+      }
+      .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .tab-group {
+        width: 100%;
+        padding: 3px;
+        gap: 4px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .tab-group::-webkit-scrollbar {
+        display: none;
+      }
+      .btn-tab {
+        padding: 5px 9px;
+        font-size: 11px;
+      }
+      .canvas-container {
+        height: 310px;
+        min-height: 310px;
+      }
+      .chart-footer {
+        font-size: 10px;
+      }
+      .legend-item {
+        font-size: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .preset-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .btn-preset {
+        padding: 7px 8px;
+      }
+      .btn-preset-name {
+        font-size: 10.5px;
+      }
+      .btn-preset-sub {
+        font-size: 9px;
+      }
+      .canvas-container {
+        height: 280px;
+        min-height: 280px;
+      }
+      .brand-group {
+        gap: 8px;
+      }
+      .brand-icon {
+        width: 30px;
+        height: 30px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -490,7 +606,7 @@
   <header>
     <div class="brand-group">
       <div class="brand-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
           <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
         </svg>
       </div>
@@ -505,14 +621,14 @@
 
     <div class="nav-actions">
       <div>
-        <span style="color: #64748B;">规范标准:</span>
-        <span style="color: #E2E8F0;">ECSS-E-ST-10-04C / AP9 / CREME96</span>
+        <span style="color: #64748B;">规范:</span>
+        <span style="color: #E2E8F0;">ECSS / AP9 / CREME96</span>
       </div>
       <button class="btn-export" onclick="exportReportCSV()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
         </svg>
-        导出能谱数据 (CSV)
+        导出CSV
       </button>
     </div>
   </header>
@@ -521,30 +637,30 @@
   <div class="app-container">
     
     <!-- LEFT SIDEBAR: Orbit Selection & Custom Inputs -->
-    <aside style="display: flex; flex-direction: column; gap: 16px;">
+    <aside style="display: flex; flex-direction: column; gap: 14px;">
       
       <!-- Preset Orbits Card -->
       <div class="card">
         <div class="card-title">
           <span>典型空间任务轨道预设</span>
-          <span id="orbitNameBadge" style="color: #00F0FF; font-family: monospace; font-size: 11px;">太阳同步极轨 (SSO)</span>
+          <span id="orbitNameBadge" style="color: #00F0FF; font-family: monospace; font-size: 11px;">商业低轨 (星链/Starlink)</span>
         </div>
         
         <div class="preset-grid">
           <button class="btn-preset" id="pre_LEO_TIANGONG" onclick="applyPreset('LEO_TIANGONG')">
-            <span class="btn-preset-name">天宫空间站</span>
+            <span class="btn-preset-name">中国空间站 (天宫)</span>
             <span class="btn-preset-sub">400km | 41.5° (SAA区)</span>
           </button>
-          <button class="btn-preset" id="pre_LEO_ISS" onclick="applyPreset('LEO_ISS')">
-            <span class="btn-preset-name">国际空间站 (ISS)</span>
-            <span class="btn-preset-sub">420km | 51.6°</span>
+          <button class="btn-preset active" id="pre_LEO_STARLINK" onclick="applyPreset('LEO_STARLINK')">
+            <span class="btn-preset-name">商业低轨 (星链Starlink)</span>
+            <span class="btn-preset-sub">550km | 53° COTS密集</span>
           </button>
-          <button class="btn-preset active" id="pre_SSO_OPTICAL" onclick="applyPreset('SSO_OPTICAL')">
+          <button class="btn-preset" id="pre_SSO_OPTICAL" onclick="applyPreset('SSO_OPTICAL')">
             <span class="btn-preset-name">太阳同步极轨 (SSO)</span>
             <span class="btn-preset-sub">700km | 98.2° 极区漏斗</span>
           </button>
           <button class="btn-preset" id="pre_LEO_MEGA" onclick="applyPreset('LEO_MEGA')">
-            <span class="btn-preset-name">低轨巨型星座</span>
+            <span class="btn-preset-name">高轨巨型星座</span>
             <span class="btn-preset-sub">1200km | 内带高质子</span>
           </button>
           <button class="btn-preset" id="pre_MEO_BEIDOU" onclick="applyPreset('MEO_BEIDOU')">
@@ -570,28 +686,28 @@
           <div class="grid-2col form-group">
             <div>
               <div class="form-label"><span>近地点 (km)</span></div>
-              <input type="number" id="inputPerigee" class="input-text" value="700" step="50" onchange="recalculateAll()">
+              <input type="number" id="inputPerigee" class="input-text" value="550" step="50" onchange="recalculateAll()">
             </div>
             <div>
               <div class="form-label"><span>远地点 (km)</span></div>
-              <input type="number" id="inputApogee" class="input-text" value="700" step="50" onchange="recalculateAll()">
+              <input type="number" id="inputApogee" class="input-text" value="550" step="50" onchange="recalculateAll()">
             </div>
           </div>
 
           <div class="form-group">
             <div class="form-label">
               <span>轨道倾角 (Inclination)</span>
-              <span class="form-val" id="labelInc">98.2°</span>
+              <span class="form-val" id="labelInc">53.0°</span>
             </div>
-            <input type="range" id="rangeInc" class="input-range" min="0" max="180" step="0.5" value="98.2" oninput="document.getElementById('labelInc').innerText = this.value + '°'; recalculateAll();">
+            <input type="range" id="rangeInc" class="input-range" min="0" max="180" step="0.5" value="53.0" oninput="document.getElementById('labelInc').innerText = this.value + '°'; recalculateAll();">
           </div>
 
           <div class="form-group">
             <div class="form-label">
               <span>等效铝屏蔽厚度</span>
-              <span class="form-val" id="labelShield">3.0 mm Al (0.81 g/cm²)</span>
+              <span class="form-val" id="labelShield">2.0 mm Al (0.54 g/cm²)</span>
             </div>
-            <input type="range" id="rangeShield" class="input-range" min="0.5" max="25" step="0.5" value="3.0" oninput="document.getElementById('labelShield').innerText = this.value + ' mm Al (' + (this.value*0.27).toFixed(2) + ' g/cm²)'; recalculateAll();">
+            <input type="range" id="rangeShield" class="input-range" min="0.5" max="25" step="0.5" value="2.0" oninput="document.getElementById('labelShield').innerText = this.value + ' mm Al (' + (this.value*0.27).toFixed(2) + ' g/cm²)'; recalculateAll();">
           </div>
 
           <div class="grid-2col form-group" style="margin-top: 8px;">
@@ -632,8 +748,8 @@
 
         <div>
           <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: monospace; margin-bottom: 4px;">
-            <span style="color: #00F0FF;">质子诱发比例: <strong id="valProtonRatio">85%</strong></span>
-            <span style="color: #A855F7;">重离子诱发比例: <strong id="valHeavyIonRatio">15%</strong></span>
+            <span style="color: #00F0FF;">质子诱发: <strong id="valProtonRatio">85%</strong></span>
+            <span style="color: #A855F7;">重离子诱发: <strong id="valHeavyIonRatio">15%</strong></span>
           </div>
           <div class="progress-bar-container">
             <div id="barProton" class="progress-proton" style="width: 85%;"></div>
@@ -654,9 +770,9 @@
       <!-- Top 4 Numerical Indicators -->
       <div class="stat-bar">
         <div class="stat-card" style="border-top: 2px solid #00F0FF;">
-          <div class="stat-label">质子日积分注量 (E > 30 MeV)</div>
+          <div class="stat-label">质子日注量 (E > 30 MeV)</div>
           <div class="stat-num" id="statProton30" style="color: #00F0FF;">1.4×10⁷</div>
-          <div class="stat-unit">cm⁻² · day⁻¹ (3mm Al 穿透)</div>
+          <div class="stat-unit">cm⁻² · day⁻¹ (屏蔽穿透)</div>
         </div>
         <div class="stat-card" style="border-top: 2px solid #10B981;">
           <div class="stat-label">反照 / 散裂中子总注量</div>
@@ -669,9 +785,9 @@
           <div class="stat-unit">MeV · cm² / mg (地磁截断)</div>
         </div>
         <div class="stat-card" style="border-top: 2px solid #F59E0B;">
-          <div class="stat-label">等效地磁截止刚度 (Rc)</div>
+          <div class="stat-label">等效截止刚度 (Rc)</div>
           <div class="stat-num" id="statRc" style="color: #F59E0B;">0.85</div>
-          <div class="stat-unit">GV (极区/高度修正平均值)</div>
+          <div class="stat-unit">GV (地磁保护屏障)</div>
         </div>
       </div>
 
@@ -683,22 +799,22 @@
             <button class="btn-tab active" id="tabProton" onclick="setChartTab('PROTON')">质子能谱 (Proton)</button>
             <button class="btn-tab" id="tabNeutron" onclick="setChartTab('NEUTRON')">中子能谱 (Neutron)</button>
             <button class="btn-tab" id="tabHeavy" onclick="setChartTab('HEAVY_LET')">重离子积分 LET 谱</button>
-            <button class="btn-tab" id="tabAll" onclick="setChartTab('ALL')">全谱系综合视图</button>
+            <button class="btn-tab" id="tabAll" onclick="setChartTab('ALL')">全谱系对比</button>
           </div>
 
           <div class="toggle-group">
             <label>
               <input type="checkbox" id="chkDiff" checked onchange="renderChart()">
-              <span>显示微分谱</span>
+              <span>微分谱</span>
             </label>
             <label>
               <input type="checkbox" id="chkInteg" checked onchange="renderChart()">
-              <span>显示积分谱</span>
+              <span>积分谱</span>
             </label>
           </div>
         </div>
 
-        <!-- Canvas Container -->
+        <!-- Canvas Container (supports touch dragging) -->
         <div class="canvas-container" id="canvasBox">
           <canvas id="chartCanvas"></canvas>
           <div class="chart-tooltip" id="chartTooltip"></div>
@@ -707,7 +823,7 @@
         <!-- Legend & Notice -->
         <div class="chart-footer">
           <div class="legend-box" id="chartLegend"></div>
-          <div>双对数坐标 (Log-Log Scale) | 移动光标可查看沿线精确通量数值</div>
+          <div>双对数坐标 (Log-Log) | 触控或滑动光标查看沿线数值</div>
         </div>
 
       </div>
@@ -715,8 +831,8 @@
       <!-- Data Table -->
       <div class="card">
         <div class="card-title">
-          <span>当前轨道粒子能谱与通量精细数值表 (Spectrum Data Grid)</span>
-          <span style="color: #64748B; font-family: monospace; font-size: 11px;">单位: cm⁻² · day⁻¹ (积分) / cm⁻²·s⁻¹·MeV⁻¹ (微分)</span>
+          <span>当前轨道粒子能谱与通量精细数值表 (Data Grid)</span>
+          <span style="color: #64748B; font-family: monospace; font-size: 10px;">单位: cm⁻²·day⁻¹ (积分) / cm⁻²·s⁻¹·MeV⁻¹ (微分)</span>
         </div>
 
         <div class="table-container">
@@ -744,7 +860,7 @@
 
   <!-- Footer -->
   <footer>
-    AeroRad-Studio &copy; 2026 宇航抗辐射与空间环境工程技术系统 | 符合 ECSS-E-ST-10-04C 及 GJB 标准规范
+    AeroRad-Studio &copy; 2026 宇航抗辐射与空间环境工程技术系统 | 符合 ECSS-E-ST-10-04C 及 GJB 规范
   </footer>
 
   <!-- Core JavaScript Engine -->
@@ -752,24 +868,24 @@
     // Global State
     let currentTab = 'PROTON';
     let currentOrbit = {
-      name: '太阳同步极轨 (SSO)',
-      perigee: 700,
-      apogee: 700,
-      inc: 98.2,
-      shield: 3.0,
+      name: '商业低轨 (星链/Starlink)',
+      perigee: 550,
+      apogee: 550,
+      inc: 53.0,
+      shield: 2.0,
       solarCycle: 'SOLAR_MAX',
       spe: 'NONE',
       threshold: 15.0
     };
 
     const PRESETS = {
-      'LEO_TIANGONG': { name: '中国空间站 (天宫)', perigee: 400, apogee: 400, inc: 41.5, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
-      'LEO_ISS': { name: '国际空间站 (ISS)', perigee: 420, apogee: 420, inc: 51.6, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
+      'LEO_TIANGONG': { name: '中国空间站 (天宫)', perigee: 400, apogee: 400, inc: 41.5, shield: 3.5, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
+      'LEO_STARLINK': { name: '商业低轨 (星链Starlink)', perigee: 550, apogee: 550, inc: 53.0, shield: 2.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
       'SSO_OPTICAL': { name: '太阳同步极轨 (SSO)', perigee: 700, apogee: 700, inc: 98.2, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
-      'LEO_MEGA': { name: '低轨巨型星座', perigee: 1200, apogee: 1200, inc: 88.0, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
-      'MEO_BEIDOU': { name: '北斗/GPS (MEO)', perigee: 21500, apogee: 21500, inc: 55.0, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 37 },
+      'LEO_MEGA': { name: '高轨巨型星座', perigee: 1200, apogee: 1200, inc: 88.0, shield: 2.5, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
+      'MEO_BEIDOU': { name: '北斗/GPS (MEO)', perigee: 21500, apogee: 21500, inc: 55.0, shield: 4.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 37 },
       'GTO_ELEC': { name: '同步转移 (GTO)', perigee: 300, apogee: 35786, inc: 28.5, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
-      'GEO_COMM': { name: '地球静止 (GEO)', perigee: 35786, apogee: 35786, inc: 0.0, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 75 },
+      'GEO_COMM': { name: '地球静止 (GEO)', perigee: 35786, apogee: 35786, inc: 0.0, shield: 5.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 75 },
       'DEEP_MOON': { name: '月球/深空探测', perigee: 380000, apogee: 380000, inc: 0.0, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 75 }
     };
 
@@ -895,8 +1011,8 @@
     }
 
     function recalculateAll() {
-      currentOrbit.perigee = parseFloat(document.getElementById('inputPerigee').value) || 700;
-      currentOrbit.apogee = parseFloat(document.getElementById('inputApogee').value) || 700;
+      currentOrbit.perigee = parseFloat(document.getElementById('inputPerigee').value) || 550;
+      currentOrbit.apogee = parseFloat(document.getElementById('inputApogee').value) || 550;
       currentOrbit.inc = parseFloat(document.getElementById('rangeInc').value);
       currentOrbit.shield = parseFloat(document.getElementById('rangeShield').value);
       currentOrbit.solarCycle = document.getElementById('selectSolarCycle').value;
@@ -980,7 +1096,7 @@
         { type: '重离子 (LET)', cls: 'td-heavy', energy: 'LET > 1 MeV·cm²/mg', integ: phys.max_let > 30 ? (phys.isDeep ? 6800 : 3500) : 450, diff: '-', source: '银河宇宙线 (GCR) 碳/氧核', see: '先进深亚微米商用逻辑芯片软错误' },
         { type: '重离子 (LET)', cls: 'td-heavy', energy: 'LET > 10 MeV·cm²/mg', integ: phys.max_let > 30 ? (phys.isDeep ? 88.0 : 38.0) : 3.2, diff: '-', source: 'GCR 硅/钙中重核', see: '宇航抗辐射加固标准测试考核门限' },
         { type: '重离子 (LET)', cls: 'td-heavy', energy: 'LET > 37 MeV·cm²/mg', integ: phys.max_let > 37 ? (phys.isDeep ? 8.8 : 2.8) : 0.02, diff: '-', source: 'GCR 铁组核 (Fe, Z=26)', see: '商业航天 CMOS 单粒子闭锁 (SEL) 主导元凶' },
-        { type: '重离子 (LET)', cls: 'td-heavy', energy: 'LET > 75 MeV·cm²/mg', integ: phys.max_let > 75 ? (phys.isDeep ? 1.2 : 0.25) : 0, diff: '-', source: '超重宇宙线核 (Z ≥ 30)', see: '宇航绝对抗锁门限；大功率器件单粒子烧毁(SEB)' }
+        { type: '重离子 (LET)', cls: 'td-heavy', energy: 'LET > 75 MeV·cm²/mg', integ: phys.max_let > 75 ? (phys.isDeep ? 1.2 : 0.25) : 0, diff: '-', source: '超重宇宙线核 (Z ≥ 30)', see: '宇航绝对抗锁门槛；大功率器件单粒子烧毁(SEB)' }
       ];
 
       rows.forEach(r => {
@@ -1007,8 +1123,8 @@
       // Guarantee robust dimension retrieval
       let w = box.clientWidth || canvas.clientWidth || 800;
       let h = box.clientHeight || canvas.clientHeight || 420;
-      if (w < 400) w = 800;
-      if (h < 250) h = 420;
+      if (w < 280) w = 320;
+      if (h < 220) h = 280;
 
       const dpr = window.devicePixelRatio || 1;
       canvas.width = Math.round(w * dpr);
@@ -1020,25 +1136,26 @@
       ctx.fillStyle = '#040810';
       ctx.fillRect(0, 0, w, h);
 
-      // Chart Padding
-      const padL = 75;
-      const padR = 30;
-      const padT = 25;
-      const padB = 45;
-      const plotW = Math.max(100, w - padL - padR);
-      const plotH = Math.max(100, h - padT - padB);
+      // Dynamic Responsive Padding for Mobile vs Desktop
+      const isMobile = w < 520;
+      const padL = isMobile ? 50 : 75;
+      const padR = isMobile ? 15 : 30;
+      const padT = isMobile ? 18 : 25;
+      const padB = isMobile ? 36 : 45;
+      const plotW = Math.max(80, w - padL - padR);
+      const plotH = Math.max(80, h - padT - padB);
 
       const phys = calculatePhysics(currentOrbit);
 
       // Coordinate domains
       let xLabel = "粒子动能 E (MeV)";
-      let yLabel = "粒子通量 Flux (cm⁻²·day⁻¹ / cm⁻²·s⁻¹·MeV⁻¹)";
+      let yLabel = isMobile ? "通量 (cm⁻²·day⁻¹)" : "粒子通量 Flux (cm⁻²·day⁻¹ / cm⁻²·s⁻¹·MeV⁻¹)";
       let xMinLog = 0, xMaxLog = 3; // 10^0 to 10^3 MeV
       let yMinLog = 0, yMaxLog = 10; // 10^0 to 10^10
 
       if (currentTab === 'HEAVY_LET') {
-        xLabel = "硅中线性能量转移 LET (MeV·cm²/mg)";
-        yLabel = "积分重离子注量 Φ(>LET) [cm⁻²·day⁻¹]";
+        xLabel = isMobile ? "LET (MeV·cm²/mg)" : "硅中线性能量转移 LET (MeV·cm²/mg)";
+        yLabel = isMobile ? "注量率 Φ(>LET)" : "积分重离子注量 Φ(>LET) [cm⁻²·day⁻¹]";
         xMinLog = -0.5; // ~0.3
         xMaxLog = 2.0;  // 100
         yMinLog = -2;   // 10^-2
@@ -1074,13 +1191,13 @@
 
       // Y-Axis Labels (Log decades)
       ctx.fillStyle = '#64748B';
-      ctx.font = '10px monospace';
+      ctx.font = isMobile ? '8.5px monospace' : '10px monospace';
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
       for (let i = 0; i <= 6; i++) {
         const yVal = yMaxLog - ((yMaxLog - yMinLog) / 6) * i;
         const y = padT + (plotH / 6) * i;
-        ctx.fillText('10^' + yVal.toFixed(0), padL - 8, y);
+        ctx.fillText('10^' + yVal.toFixed(0), padL - (isMobile ? 4 : 8), y);
       }
 
       // X-Axis Labels
@@ -1094,16 +1211,16 @@
         else if (numStr >= 10) numStr = numStr.toFixed(0);
         else if (numStr >= 1) numStr = numStr.toFixed(1);
         else numStr = numStr.toFixed(2);
-        ctx.fillText(numStr, x, padT + plotH + 8);
+        ctx.fillText(numStr, x, padT + plotH + (isMobile ? 4 : 8));
       }
 
       // Axis Titles
       ctx.fillStyle = '#94A3B8';
-      ctx.font = '11px sans-serif';
-      ctx.fillText(xLabel, padL + plotW / 2, padT + plotH + 26);
+      ctx.font = isMobile ? '9.5px sans-serif' : '11px sans-serif';
+      ctx.fillText(xLabel, padL + plotW / 2, padT + plotH + (isMobile ? 18 : 26));
 
       ctx.save();
-      ctx.translate(18, padT + plotH / 2);
+      ctx.translate(isMobile ? 14 : 18, padT + plotH / 2);
       ctx.rotate(-Math.PI / 2);
       ctx.fillText(yLabel, 0, 0);
       ctx.restore();
@@ -1120,7 +1237,7 @@
         if (showInteg) {
           // Proton Integral Φ(>E)
           ctx.strokeStyle = '#00F0FF';
-          ctx.lineWidth = 2.5;
+          ctx.lineWidth = isMobile ? 2.0 : 2.5;
           ctx.beginPath();
           for (let step = 0; step <= 100; step++) {
             const logE = xMinLog + (xMaxLog - xMinLog) * (step / 100);
@@ -1140,7 +1257,7 @@
         if (showDiff) {
           // Proton Differential dΦ/dE
           ctx.strokeStyle = '#38BDF8';
-          ctx.lineWidth = 1.8;
+          ctx.lineWidth = isMobile ? 1.5 : 1.8;
           ctx.setLineDash([5, 3]);
           ctx.beginPath();
           for (let step = 0; step <= 100; step++) {
@@ -1162,7 +1279,7 @@
       // --- 2. NEUTRON CURVES ---
       if (currentTab === 'NEUTRON' || currentTab === 'ALL') {
         ctx.strokeStyle = '#10B981';
-        ctx.lineWidth = 2.4;
+        ctx.lineWidth = isMobile ? 2.0 : 2.4;
         ctx.beginPath();
         for (let step = 0; step <= 100; step++) {
           const logE = xMinLog + (xMaxLog - xMinLog) * (step / 100);
@@ -1175,13 +1292,13 @@
           if (step === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
         }
         ctx.stroke();
-        legend.innerHTML += `<div class="legend-item"><span class="legend-color" style="background: #10B981;"></span><span style="color: #10B981;">中子复合能谱 (大气反照+散裂)</span></div>`;
+        legend.innerHTML += `<div class="legend-item"><span class="legend-color" style="background: #10B981;"></span><span style="color: #10B981;">中子复合能谱 (反照+散裂)</span></div>`;
       }
 
       // --- 3. HEAVY ION LET SPECTRUM ---
       if (currentTab === 'HEAVY_LET' || currentTab === 'ALL') {
         ctx.strokeStyle = '#A855F7';
-        ctx.lineWidth = 2.6;
+        ctx.lineWidth = isMobile ? 2.2 : 2.6;
         ctx.beginPath();
         for (let step = 0; step <= 100; step++) {
           const logL = xMinLog + (xMaxLog - xMinLog) * (step / 100);
@@ -1211,8 +1328,8 @@
           ctx.stroke();
           ctx.setLineDash([]);
           ctx.fillStyle = '#EF4444';
-          ctx.font = '10px sans-serif';
-          ctx.fillText(`地磁截断 LETmax=${phys.max_let.toFixed(1)}`, cutX + 6, padT + 20);
+          ctx.font = isMobile ? '9px sans-serif' : '10px sans-serif';
+          ctx.fillText(`截断 LETmax=${phys.max_let.toFixed(1)}`, cutX + 4, padT + 18);
         }
       }
 
@@ -1220,40 +1337,57 @@
       canvas.chartGeo = { padL, padR, padT, padB, plotW, plotH, xMinLog, xMaxLog, yMinLog, yMaxLog, phys, currentTab, toScreenX, toScreenY };
     }
 
-    // Interactive Hover Crosshairs & Tooltip
+    // Interactive Hover & Touch Dragging Tooltip (支持触屏触摸滑动)
     const canvas = document.getElementById('chartCanvas');
     const tooltip = document.getElementById('chartTooltip');
 
-    canvas.addEventListener('mousemove', (e) => {
+    function handlePointer(clientX, clientY) {
       if (!canvas.chartGeo) return;
       const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
+      const mouseX = clientX - rect.left;
+      const mouseY = clientY - rect.top;
       const g = canvas.chartGeo;
 
       if (mouseX >= g.padL && mouseX <= g.padL + g.plotW && mouseY >= g.padT && mouseY <= g.padT + g.plotH) {
-        // Compute logical value
         const logX = g.xMinLog + ((mouseX - g.padL) / g.plotW) * (g.xMaxLog - g.xMinLog);
         const logY = g.yMaxLog - ((mouseY - g.padT) / g.plotH) * (g.yMaxLog - g.yMinLog);
         const valX = Math.pow(10, logX);
         const valY = Math.pow(10, logY);
 
         tooltip.style.display = 'block';
-        tooltip.style.left = Math.min(rect.width - 200, mouseX + 15) + 'px';
-        tooltip.style.top = Math.max(10, mouseY - 45) + 'px';
+        const tipW = 150;
+        let leftPos = mouseX + 12;
+        if (leftPos + tipW > rect.width) leftPos = mouseX - tipW - 12;
+        if (leftPos < 5) leftPos = 5;
+        tooltip.style.left = leftPos + 'px';
+        tooltip.style.top = Math.max(5, mouseY - 50) + 'px';
 
         if (g.currentTab === 'HEAVY_LET') {
-          tooltip.innerHTML = `<div><strong>LET:</strong> ${valX.toFixed(2)} MeV·cm²/mg</div><div><strong>注量率:</strong> ${formatSci(valY)} cm⁻²·day⁻¹</div>`;
+          tooltip.innerHTML = `<div><strong>LET:</strong> ${valX.toFixed(2)} MeV·cm²/mg</div><div><strong>注量率:</strong> ${formatSci(valY)}</div>`;
         } else {
-          tooltip.innerHTML = `<div><strong>能量 E:</strong> ${valX >= 10 ? valX.toFixed(1) : valX.toFixed(3)} MeV</div><div><strong>通量 Flux:</strong> ${formatSci(valY)}</div>`;
+          tooltip.innerHTML = `<div><strong>能量 E:</strong> ${valX >= 10 ? valX.toFixed(1) : valX.toFixed(3)} MeV</div><div><strong>通量:</strong> ${formatSci(valY)}</div>`;
         }
       } else {
         tooltip.style.display = 'none';
       }
-    });
+    }
 
-    canvas.addEventListener('mouseleave', () => {
-      tooltip.style.display = 'none';
+    canvas.addEventListener('mousemove', (e) => handlePointer(e.clientX, e.clientY));
+    canvas.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+
+    // Touch events for mobile phones
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches[0]) {
+        handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches[0]) {
+        handlePointer(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+    canvas.addEventListener('touchend', () => {
+      setTimeout(() => { tooltip.style.display = 'none'; }, 2000);
     });
 
     // CSV Exporter
@@ -1287,8 +1421,7 @@
 
     // Robust Initialization
     function initializeApp() {
-      applyPreset('SSO_OPTICAL');
-      // Multiple trigger points to prevent race condition
+      applyPreset('LEO_STARLINK');
       requestAnimationFrame(() => renderChart());
       setTimeout(() => renderChart(), 100);
       setTimeout(() => renderChart(), 300);
