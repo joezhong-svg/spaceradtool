@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroRad-Studio | 空间辐射环境与粒子能谱分析系统</title>
+  <style>
+    /* Reset & Base Styles (100% Offline Standalone - No external CDN required) */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #070B14;
+      color: #E2E8F0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0B0F19; }
+    ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+    /* Top Nav */
+    header {
+      background: rgba(11, 15, 25, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #1E293B;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #00F0FF, #3B82F6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.35);
+    }
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge-ver {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #083344;
+      color: #00F0FF;
+      border: 1px solid #0E7490;
+      font-family: monospace;
+    }
+    .brand-desc {
+      font-size: 11px;
+      color: #94A3B8;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 12px;
+      font-family: monospace;
+    }
+    .btn-export {
+      background: #1E293B;
+      color: #F1F5F9;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-export:hover {
+      background: #334155;
+      border-color: #00F0FF;
+      color: #00F0FF;
+    }
+
+    /* Layout */
+    .app-container {
+      flex: 1;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+      max-width: 1920px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    @media (max-width: 1100px) {
+      .app-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Glass Cards */
+    .card {
+      background: #0F172A;
+      border: 1px solid #1E293B;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Preset Buttons Grid */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .btn-preset {
+      background: #182234;
+      border: 1px solid #283548;
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #CBD5E1;
+      font-size: 11px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+      line-height: 1.4;
+    }
+    .btn-preset:hover {
+      background: #202E44;
+      border-color: #00F0FF;
+      color: #FFFFFF;
+    }
+    .btn-preset.active {
+      background: #083344;
+      border-color: #00F0FF;
+      color: #00F0FF;
+      box-shadow: 0 0 10px rgba(0,240,255,0.2);
+    }
+    .btn-preset-name {
+      font-weight: bold;
+      display: block;
+    }
+    .btn-preset-sub {
+      font-size: 10px;
+      color: #64748B;
+      font-family: monospace;
+    }
+
+    /* Form Controls */
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #94A3B8;
+      margin-bottom: 4px;
+    }
+    .form-val {
+      color: #00F0FF;
+      font-family: monospace;
+      font-weight: 600;
+    }
+    .input-range {
+      width: 100%;
+      height: 6px;
+      background: #1E293B;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .input-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #00F0FF;
+      cursor: pointer;
+      box-shadow: 0 0 8px #00F0FF;
+    }
+    .input-text, select {
+      width: 100%;
+      background: #182234;
+      border: 1px solid #283548;
+      color: #FFFFFF;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 12px;
+      outline: none;
+    }
+    .input-text:focus, select:focus {
+      border-color: #00F0FF;
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    /* Risk Box */
+    .risk-box {
+      border-left: 4px solid #00F0FF;
+    }
+    .badge-risk {
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .risk-high {
+      background: #450A0A;
+      color: #FCA5A5;
+      border: 1px solid #991B1B;
+    }
+    .risk-medium {
+      background: #422006;
+      color: #FDE047;
+      border: 1px solid #854D0E;
+    }
+    .risk-low {
+      background: #064E3B;
+      color: #6EE7B7;
+      border: 1px solid #065F46;
+    }
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #1E293B;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      margin: 8px 0;
+    }
+    .progress-proton {
+      background: #00F0FF;
+      height: 100%;
+      transition: width 0.3s;
+    }
+    .progress-heavy {
+      background: #A855F7;
+      height: 100%;
+      transition: width 0.3s;
+    }
+
+    /* Main Right Content */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Stat Cards Bar */
+    .stat-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 800px) {
+      .stat-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .stat-card {
+      background: #0F172A;
+      border: 1px solid #1E293B;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: #94A3B8;
+      font-weight: 500;
+    }
+    .stat-num {
+      font-size: 20px;
+      font-weight: bold;
+      font-family: monospace;
+      margin: 4px 0 2px 0;
+    }
+    .stat-unit {
+      font-size: 10px;
+      color: #64748B;
+    }
+
+    /* Chart Section */
+    .chart-card {
+      background: #0F172A;
+      border: 1px solid #1E293B;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #1E293B;
+    }
+    .tab-group {
+      display: flex;
+      gap: 6px;
+      background: #070B14;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid #1E293B;
+    }
+    .btn-tab {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-tab:hover {
+      color: #FFFFFF;
+    }
+    .btn-tab.active {
+      background: #0284C7;
+      color: #FFFFFF;
+      box-shadow: 0 0 10px rgba(2,132,199,0.4);
+    }
+    .toggle-group {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: #CBD5E1;
+      align-items: center;
+    }
+    .toggle-group label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    /* Canvas Frame */
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      min-height: 420px;
+      background: #040810;
+      border: 1px solid #1E293B;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    #chartCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+    .chart-tooltip {
+      position: absolute;
+      display: none;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #00F0FF;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #FFFFFF;
+      font-family: monospace;
+      pointer-events: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      z-index: 100;
+      line-height: 1.5;
+    }
+
+    .chart-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      font-size: 11px;
+      color: #64748B;
+      font-family: monospace;
+    }
+    .legend-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .legend-color {
+      width: 14px;
+      height: 3px;
+      border-radius: 2px;
+    }
+
+    /* Data Table */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      text-align: left;
+    }
+    th {
+      background: #0B1220;
+      color: #94A3B8;
+      padding: 8px 10px;
+      font-weight: 600;
+      border-bottom: 1px solid #1E293B;
+      white-space: nowrap;
+    }
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #151F32;
+      white-space: nowrap;
+    }
+    tr:hover td {
+      background: #141F35;
+    }
+    .td-num {
+      font-family: monospace;
+      color: #F8FAFC;
+    }
+    .td-proton { color: #00F0FF; font-weight: bold; }
+    .td-neutron { color: #10B981; font-weight: bold; }
+    .td-heavy { color: #A855F7; font-weight: bold; }
+
+    footer {
+      border-top: 1px solid #1E293B;
+      background: #070B14;
+      padding: 12px;
+      text-align: center;
+      font-size: 11px;
+      color: #64748B;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header>
+    <div class="brand-group">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">
+          AeroRad-Studio
+          <span class="badge-ver">v2.5 PRO</span>
+        </div>
+        <div class="brand-desc">航天器空间辐射环境与粒子能谱分析系统 (Proton / Neutron / Heavy Ion LET)</div>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <div>
+        <span style="color: #64748B;">规范标准:</span>
+        <span style="color: #E2E8F0;">ECSS-E-ST-10-04C / AP9 / CREME96</span>
+      </div>
+      <button class="btn-export" onclick="exportReportCSV()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+        </svg>
+        导出能谱数据 (CSV)
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="app-container">
+    
+    <!-- LEFT SIDEBAR: Orbit Selection & Custom Inputs -->
+    <aside style="display: flex; flex-direction: column; gap: 16px;">
+      
+      <!-- Preset Orbits Card -->
+      <div class="card">
+        <div class="card-title">
+          <span>典型空间任务轨道预设</span>
+          <span id="orbitNameBadge" style="color: #00F0FF; font-family: monospace; font-size: 11px;">太阳同步极轨 (SSO)</span>
+        </div>
+        
+        <div class="preset-grid">
+          <button class="btn-preset" id="pre_LEO_TIANGONG" onclick="applyPreset('LEO_TIANGONG')">
+            <span class="btn-preset-name">天宫空间站</span>
+            <span class="btn-preset-sub">400km | 41.5° (SAA区)</span>
+          </button>
+          <button class="btn-preset" id="pre_LEO_ISS" onclick="applyPreset('LEO_ISS')">
+            <span class="btn-preset-name">国际空间站 (ISS)</span>
+            <span class="btn-preset-sub">420km | 51.6°</span>
+          </button>
+          <button class="btn-preset active" id="pre_SSO_OPTICAL" onclick="applyPreset('SSO_OPTICAL')">
+            <span class="btn-preset-name">太阳同步极轨 (SSO)</span>
+            <span class="btn-preset-sub">700km | 98.2° 极区漏斗</span>
+          </button>
+          <button class="btn-preset" id="pre_LEO_MEGA" onclick="applyPreset('LEO_MEGA')">
+            <span class="btn-preset-name">低轨巨型星座</span>
+            <span class="btn-preset-sub">1200km | 内带高质子</span>
+          </button>
+          <button class="btn-preset" id="pre_MEO_BEIDOU" onclick="applyPreset('MEO_BEIDOU')">
+            <span class="btn-preset-name">北斗/GPS (MEO)</span>
+            <span class="btn-preset-sub">21500km | 55° 外辐射带</span>
+          </button>
+          <button class="btn-preset" id="pre_GTO_ELEC" onclick="applyPreset('GTO_ELEC')">
+            <span class="btn-preset-name">同步转移 (GTO)</span>
+            <span class="btn-preset-sub">300×35786km 贯穿</span>
+          </button>
+          <button class="btn-preset" id="pre_GEO_COMM" onclick="applyPreset('GEO_COMM')">
+            <span class="btn-preset-name">地球静止 (GEO)</span>
+            <span class="btn-preset-sub">35786km | 0° 宇宙线直击</span>
+          </button>
+          <button class="btn-preset" id="pre_DEEP_MOON" onclick="applyPreset('DEEP_MOON')">
+            <span class="btn-preset-name">月球/深空探测</span>
+            <span class="btn-preset-sub">自由空间 零地磁屏蔽</span>
+          </button>
+        </div>
+
+        <!-- Custom Parameters -->
+        <div style="border-top: 1px solid #1E293B; padding-top: 12px;">
+          <div class="grid-2col form-group">
+            <div>
+              <div class="form-label"><span>近地点 (km)</span></div>
+              <input type="number" id="inputPerigee" class="input-text" value="700" step="50" onchange="recalculateAll()">
+            </div>
+            <div>
+              <div class="form-label"><span>远地点 (km)</span></div>
+              <input type="number" id="inputApogee" class="input-text" value="700" step="50" onchange="recalculateAll()">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">
+              <span>轨道倾角 (Inclination)</span>
+              <span class="form-val" id="labelInc">98.2°</span>
+            </div>
+            <input type="range" id="rangeInc" class="input-range" min="0" max="180" step="0.5" value="98.2" oninput="document.getElementById('labelInc').innerText = this.value + '°'; recalculateAll();">
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">
+              <span>等效铝屏蔽厚度</span>
+              <span class="form-val" id="labelShield">3.0 mm Al (0.81 g/cm²)</span>
+            </div>
+            <input type="range" id="rangeShield" class="input-range" min="0.5" max="25" step="0.5" value="3.0" oninput="document.getElementById('labelShield').innerText = this.value + ' mm Al (' + (this.value*0.27).toFixed(2) + ' g/cm²)'; recalculateAll();">
+          </div>
+
+          <div class="grid-2col form-group" style="margin-top: 8px;">
+            <div>
+              <div class="form-label"><span>太阳活动周期</span></div>
+              <select id="selectSolarCycle" onchange="recalculateAll()">
+                <option value="SOLAR_MIN">极小期 (GCR最强)</option>
+                <option value="SOLAR_MAX" selected>极大期 (GCR稍弱)</option>
+              </select>
+            </div>
+            <div>
+              <div class="form-label"><span>太阳质子事件 (SPE)</span></div>
+              <select id="selectSPE" onchange="recalculateAll()">
+                <option value="NONE" selected>常态背景</option>
+                <option value="MODERATE">中等风暴 (SPE)</option>
+                <option value="EXTREME">极端风暴 (1989峰值)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="border-top: 1px solid #1E293B; padding-top: 10px; margin-top: 10px;">
+            <div class="form-label">
+              <span>器件 SEE 翻转门限 (LETth)</span>
+              <span class="form-val" id="labelThreshold" style="color: #A855F7;">15.0 MeV·cm²/mg</span>
+            </div>
+            <input type="range" id="rangeThreshold" class="input-range" min="0.5" max="85" step="0.5" value="15.0" oninput="document.getElementById('labelThreshold').innerText = this.value + ' MeV·cm²/mg'; recalculateAll();">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SEE Risk Assessment Card -->
+      <div class="card risk-box">
+        <div class="card-title">
+          <span>单粒子效应 (SEE) 物理风险研判</span>
+          <span id="riskLevelBadge" class="badge-risk risk-medium">中度风险</span>
+        </div>
+
+        <div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: monospace; margin-bottom: 4px;">
+            <span style="color: #00F0FF;">质子诱发比例: <strong id="valProtonRatio">85%</strong></span>
+            <span style="color: #A855F7;">重离子诱发比例: <strong id="valHeavyIonRatio">15%</strong></span>
+          </div>
+          <div class="progress-bar-container">
+            <div id="barProton" class="progress-proton" style="width: 85%;"></div>
+            <div id="barHeavy" class="progress-heavy" style="width: 15%;"></div>
+          </div>
+        </div>
+
+        <div id="boxAdvice" style="margin-top: 10px; background: rgba(7, 11, 20, 0.6); padding: 10px; border-radius: 6px; font-size: 11px; line-height: 1.6; color: #CBD5E1; border: 1px solid #1E293B;">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- RIGHT MAIN: Stat Cards, Chart Canvas & Table -->
+    <main class="main-content">
+      
+      <!-- Top 4 Numerical Indicators -->
+      <div class="stat-bar">
+        <div class="stat-card" style="border-top: 2px solid #00F0FF;">
+          <div class="stat-label">质子日积分注量 (E > 30 MeV)</div>
+          <div class="stat-num" id="statProton30" style="color: #00F0FF;">1.4×10⁷</div>
+          <div class="stat-unit">cm⁻² · day⁻¹ (3mm Al 穿透)</div>
+        </div>
+        <div class="stat-card" style="border-top: 2px solid #10B981;">
+          <div class="stat-label">反照 / 散裂中子总注量</div>
+          <div class="stat-num" id="statNeutronTotal" style="color: #10B981;">4.5×10⁵</div>
+          <div class="stat-unit">cm⁻² · day⁻¹ (复合全能段)</div>
+        </div>
+        <div class="stat-card" style="border-top: 2px solid #A855F7;">
+          <div class="stat-label">重离子物理截止 (LETmax)</div>
+          <div class="stat-num" id="statMaxLET" style="color: #A855F7;">85.0</div>
+          <div class="stat-unit">MeV · cm² / mg (地磁截断)</div>
+        </div>
+        <div class="stat-card" style="border-top: 2px solid #F59E0B;">
+          <div class="stat-label">等效地磁截止刚度 (Rc)</div>
+          <div class="stat-num" id="statRc" style="color: #F59E0B;">0.85</div>
+          <div class="stat-unit">GV (极区/高度修正平均值)</div>
+        </div>
+      </div>
+
+      <!-- Canvas Spectrum Chart -->
+      <div class="chart-card">
+        
+        <div class="chart-header">
+          <div class="tab-group">
+            <button class="btn-tab active" id="tabProton" onclick="setChartTab('PROTON')">质子能谱 (Proton)</button>
+            <button class="btn-tab" id="tabNeutron" onclick="setChartTab('NEUTRON')">中子能谱 (Neutron)</button>
+            <button class="btn-tab" id="tabHeavy" onclick="setChartTab('HEAVY_LET')">重离子积分 LET 谱</button>
+            <button class="btn-tab" id="tabAll" onclick="setChartTab('ALL')">全谱系综合视图</button>
+          </div>
+
+          <div class="toggle-group">
+            <label>
+              <input type="checkbox" id="chkDiff" checked onchange="renderChart()">
+              <span>显示微分谱</span>
+            </label>
+            <label>
+              <input type="checkbox" id="chkInteg" checked onchange="renderChart()">
+              <span>显示积分谱</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="canvas-container" id="canvasBox">
+          <canvas id="chartCanvas"></canvas>
+          <div class="chart-tooltip" id="chartTooltip"></div>
+        </div>
+
+        <!-- Legend & Notice -->
+        <div class="chart-footer">
+          <div class="legend-box" id="chartLegend"></div>
+          <div>双对数坐标 (Log-Log Scale) | 移动光标可查看沿线精确通量数值</div>
+        </div>
+
+      </div>
+
+      <!-- Data Table -->
+      <div class="card">
+        <div class="card-title">
+          <span>当前轨道粒子能谱与通量精细数值表 (Spectrum Data Grid)</span>
+          <span style="color: #64748B; font-family: monospace; font-size: 11px;">单位: cm⁻² · day⁻¹ (积分) / cm⁻²·s⁻¹·MeV⁻¹ (微分)</span>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>粒子类型</th>
+                <th>能量 / LET 档位</th>
+                <th>日积分注量率 Φ(>E, >LET)</th>
+                <th>微分通量峰值 dΦ/dE</th>
+                <th>主要物理来源</th>
+                <th>单粒子效应主要威胁</th>
+              </tr>
+            </thead>
+            <tbody id="spectrumTableBody">
+              <!-- Injected by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    AeroRad-Studio &copy; 2026 宇航抗辐射与空间环境工程技术系统 | 符合 ECSS-E-ST-10-04C 及 GJB 标准规范
+  </footer>
+
+  <!-- Core JavaScript Engine -->
+  <script>
+    // Global State
+    let currentTab = 'PROTON';
+    let currentOrbit = {
+      name: '太阳同步极轨 (SSO)',
+      perigee: 700,
+      apogee: 700,
+      inc: 98.2,
+      shield: 3.0,
+      solarCycle: 'SOLAR_MAX',
+      spe: 'NONE',
+      threshold: 15.0
+    };
+
+    const PRESETS = {
+      'LEO_TIANGONG': { name: '中国空间站 (天宫)', perigee: 400, apogee: 400, inc: 41.5, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
+      'LEO_ISS': { name: '国际空间站 (ISS)', perigee: 420, apogee: 420, inc: 51.6, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
+      'SSO_OPTICAL': { name: '太阳同步极轨 (SSO)', perigee: 700, apogee: 700, inc: 98.2, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
+      'LEO_MEGA': { name: '低轨巨型星座', perigee: 1200, apogee: 1200, inc: 88.0, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
+      'MEO_BEIDOU': { name: '北斗/GPS (MEO)', perigee: 21500, apogee: 21500, inc: 55.0, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 37 },
+      'GTO_ELEC': { name: '同步转移 (GTO)', perigee: 300, apogee: 35786, inc: 28.5, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 15 },
+      'GEO_COMM': { name: '地球静止 (GEO)', perigee: 35786, apogee: 35786, inc: 0.0, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 75 },
+      'DEEP_MOON': { name: '月球/深空探测', perigee: 380000, apogee: 380000, inc: 0.0, shield: 3.0, solarCycle: 'SOLAR_MAX', spe: 'NONE', threshold: 75 }
+    };
+
+    function applyPreset(key) {
+      const p = PRESETS[key];
+      if (!p) return;
+      currentOrbit = { ...p };
+
+      // Update preset buttons active state
+      for (const k in PRESETS) {
+        const btn = document.getElementById('pre_' + k);
+        if (btn) {
+          if (k === key) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      }
+
+      document.getElementById('inputPerigee').value = p.perigee;
+      document.getElementById('inputApogee').value = p.apogee;
+      document.getElementById('rangeInc').value = p.inc;
+      document.getElementById('labelInc').innerText = p.inc + '°';
+      document.getElementById('rangeShield').value = p.shield;
+      document.getElementById('labelShield').innerText = p.shield + ' mm Al (' + (p.shield * 0.27).toFixed(2) + ' g/cm²)';
+      document.getElementById('selectSolarCycle').value = p.solarCycle;
+      document.getElementById('selectSPE').value = p.spe;
+      document.getElementById('rangeThreshold').value = p.threshold;
+      document.getElementById('labelThreshold').innerText = p.threshold + ' MeV·cm²/mg';
+      document.getElementById('orbitNameBadge').innerText = p.name;
+
+      recalculateAll();
+    }
+
+    function setChartTab(tab) {
+      currentTab = tab;
+      const tabs = [
+        { id: 'tabProton', name: 'PROTON' },
+        { id: 'tabNeutron', name: 'NEUTRON' },
+        { id: 'tabHeavy', name: 'HEAVY_LET' },
+        { id: 'tabAll', name: 'ALL' }
+      ];
+      tabs.forEach(t => {
+        const el = document.getElementById(t.id);
+        if (el) {
+          if (t.name === tab) el.classList.add('active');
+          else el.classList.remove('active');
+        }
+      });
+      renderChart();
+    }
+
+    // Mathematical Physics Models
+    function calculatePhysics(orbit) {
+      const h = (orbit.perigee + orbit.apogee) / 2;
+      const inc = orbit.inc;
+      const shield = orbit.shield;
+      const isPolar = inc >= 70 && inc <= 110;
+      const isDeep = h > 70000;
+
+      // 1. Geomagnetic Cutoff Rigidity Rc (GV) - Størmer formula
+      let Rc = 0;
+      if (!isDeep) {
+        const r_ratio = 6371 / (6371 + h);
+        const rad_inc = (inc * Math.PI) / 180;
+        Rc = 14.9 * Math.pow(r_ratio, 2) * Math.pow(Math.cos(rad_inc), 4);
+        if (isPolar) Rc = Math.min(Rc, 0.85); // Polar funnel
+        if (h > 20000) Rc = Math.min(Rc, 0.1);
+      }
+
+      // 2. Trapped Protons (AP8 / AP9 altitude distribution)
+      let trapped_scale = 0;
+      let saa_peak = 0;
+      if (h <= 600) {
+        trapped_scale = (h - 200) / 400 * 1.5e6;
+        saa_peak = trapped_scale / 500;
+      } else if (h <= 1500) {
+        // High LEO peak in inner belt
+        trapped_scale = 1.5e6 * Math.pow(10, (h - 600) / 600 * 1.8);
+        saa_peak = trapped_scale / 600;
+      } else if (h <= 6000) {
+        trapped_scale = 1e8 * Math.exp(-(h - 1500) / 1500);
+        saa_peak = trapped_scale / 800;
+      } else {
+        trapped_scale = 0;
+        saa_peak = 0;
+      }
+
+      // Aluminum Shielding cutoff energy (Bragg peak penetration threshold)
+      const proton_cutoff_E = 12 * Math.sqrt(shield);
+
+      // GCR Protons
+      let gcr_p_daily = isDeep ? 3.0e5 : (2.0e5 * (1 - Math.min(Rc / 15, 0.85)));
+
+      // SPE factor
+      let spe_p_daily = 0;
+      if (orbit.spe === 'MODERATE') spe_p_daily = isDeep || isPolar || h > 15000 ? 5e8 : 1e7;
+      if (orbit.spe === 'EXTREME') spe_p_daily = isDeep || isPolar || h > 15000 ? 4e10 : 8e8;
+
+      // Proton Flux > 30 MeV
+      let p30 = (trapped_scale * Math.exp(-30 / 50)) + gcr_p_daily + spe_p_daily;
+      if (30 < proton_cutoff_E) p30 *= Math.exp(-(proton_cutoff_E - 30) / 10);
+
+      // 3. Neutrons
+      // Atmospheric Albedo (peaks in LEO)
+      let albedo_n = (h <= 1000) ? (5e5 * Math.exp(-h / 800)) : 1e4;
+      // Secondary spallation from shielding Al: ~3.5% per 3mm of primary protons/ions
+      let spallation_n = (p30 + 1e4) * (shield / 3.0) * 0.035;
+      let total_n = albedo_n + spallation_n;
+      if (isDeep) total_n = spallation_n + 1.2e4;
+
+      // 4. Heavy Ions & Physical LET cutoff
+      let max_let = 95;
+      if (Rc > 10) max_let = 32;
+      else if (Rc > 5) max_let = 55;
+      else if (Rc > 1) max_let = 85;
+      else max_let = 95;
+
+      return {
+        h, inc, shield, Rc, p30, saa_peak,
+        total_n, albedo_n, spallation_n,
+        max_let, isDeep, isPolar, spe_p_daily,
+        proton_cutoff_E
+      };
+    }
+
+    function recalculateAll() {
+      currentOrbit.perigee = parseFloat(document.getElementById('inputPerigee').value) || 700;
+      currentOrbit.apogee = parseFloat(document.getElementById('inputApogee').value) || 700;
+      currentOrbit.inc = parseFloat(document.getElementById('rangeInc').value);
+      currentOrbit.shield = parseFloat(document.getElementById('rangeShield').value);
+      currentOrbit.solarCycle = document.getElementById('selectSolarCycle').value;
+      currentOrbit.spe = document.getElementById('selectSPE').value;
+      currentOrbit.threshold = parseFloat(document.getElementById('rangeThreshold').value);
+
+      const phys = calculatePhysics(currentOrbit);
+
+      // Update stat cards
+      document.getElementById('statProton30').innerText = formatSci(phys.p30);
+      document.getElementById('statNeutronTotal').innerText = formatSci(phys.total_n);
+      document.getElementById('statMaxLET').innerText = phys.max_let.toFixed(1);
+      document.getElementById('statRc').innerText = phys.Rc > 0 ? phys.Rc.toFixed(2) : '< 0.05';
+
+      // Update SEE Risk
+      const th = currentOrbit.threshold;
+      let protonRatio = 0.85;
+      if (phys.h > 15000 && currentOrbit.spe === 'NONE') {
+        protonRatio = 0.20;
+      } else if (phys.h <= 1500) {
+        protonRatio = 0.92;
+      }
+      if (currentOrbit.spe !== 'NONE') protonRatio = 0.98;
+
+      const heavyRatio = 1 - protonRatio;
+      document.getElementById('valProtonRatio').innerText = Math.round(protonRatio * 100) + '%';
+      document.getElementById('valHeavyIonRatio').innerText = Math.round(heavyRatio * 100) + '%';
+      document.getElementById('barProton').style.width = Math.round(protonRatio * 100) + '%';
+      document.getElementById('barHeavy').style.width = Math.round(heavyRatio * 100) + '%';
+
+      // Risk badge and Advice
+      const riskBadge = document.getElementById('riskLevelBadge');
+      const boxAdvice = document.getElementById('boxAdvice');
+
+      if (th < 1.5) {
+        riskBadge.innerText = "极度危险 (直接电离)";
+        riskBadge.className = "badge-risk risk-high";
+        boxAdvice.innerHTML = `<span style="color: #F87171; font-weight: bold;">【警报】低临界电荷库仑直接电离区 (LETth < 1.5 MeV·cm²/mg)：</span>器件翻转阈值极低，低能质子 Bragg 峰库仑直接电离即可诱发翻转！在当前轨道将面临密集的突发性 SEU，普通单比特汉明纠错将被击穿，建议采用双互锁单元 (DICE) 或物理加固器件。`;
+      } else if (th < 15.0) {
+        riskBadge.innerText = "高风险 (SEU频发)";
+        riskBadge.className = "badge-risk risk-medium";
+        boxAdvice.innerHTML = `<span style="color: #FBBF24; font-weight: bold;">【高频翻转预警 (1.5 ≤ LETth < 15)：</span>器件主要受高能质子非弹性核碰撞散裂次级碎片及常见宇宙线重离子翻转威胁。建议：星载计算机配置高频后台 Memory Scrubbing 周期性巡检刷新，并在通信总线加设 EDAC。`;
+      } else if (th < 75.0 && phys.max_let > th) {
+        riskBadge.innerText = "中度风险 (防SEL闭锁)";
+        riskBadge.className = "badge-risk risk-medium";
+        boxAdvice.innerHTML = `<span style="color: #38BDF8; font-weight: bold;">【单粒子锁定防护重点】：</span>翻转率较低，但当前轨道重离子物理截止 LET (${phys.max_let.toFixed(1)}) 超过器件防锁门限 (${th.toFixed(1)})。在深空或极区存在潜在 SEL 锁定风险，星载电源总线必须配备毫秒级自愈断电过流保护拓扑。`;
+      } else {
+        riskBadge.innerText = "低风险 (宇航高可靠)";
+        riskBadge.className = "badge-risk risk-low";
+        boxAdvice.innerHTML = `<span style="color: #34D399; font-weight: bold;">【运行基线稳定】：</span>器件门限高于绝大部分辐射威胁，系统对质子核反应及中能重离子具有天然免疫力，系统全寿命周期单粒子故障率极低。`;
+      }
+
+      updateTableData(phys);
+      renderChart();
+    }
+
+    function formatSci(val) {
+      if (val === 0) return '0';
+      if (val >= 1e6 || val < 1e-2) {
+        return val.toExponential(2).replace('e+', '×10^').replace('e-', '×10^-').replace('^', '');
+      }
+      return val.toFixed(1);
+    }
+
+    function updateTableData(phys) {
+      const tbody = document.getElementById('spectrumTableBody');
+      tbody.innerHTML = '';
+
+      const rows = [
+        // Protons
+        { type: '质子 (Proton)', cls: 'td-proton', energy: '> 1 MeV (低能质子)', integ: phys.p30 * 4.5, diff: phys.p30 * 0.08, source: 'SAA 俘获带 / 低能质子', see: '触发先进纳米节点 COTS 直接电离 SEU' },
+        { type: '质子 (Proton)', cls: 'td-proton', energy: '> 10 MeV (薄壁穿透)', integ: phys.p30 * 2.2, diff: phys.p30 * 0.03, source: '内辐射带俘获质子核心', see: '穿透航天器薄壁蒙皮' },
+        { type: '质子 (Proton)', cls: 'td-proton', energy: '> 30 MeV (标准3mmAl)', integ: phys.p30, diff: phys.p30 * 0.015, source: '内带质子峰值 / SPE', see: '质子非弹性核碰撞生成次级反冲重核' },
+        { type: '质子 (Proton)', cls: 'td-proton', energy: '> 100 MeV (深穿高能)', integ: phys.p30 * 0.22, diff: phys.p30 * 0.003, source: '高能俘获质子 / GCR', see: '穿透重型机箱直达多层板敏感单元' },
+
+        // Neutrons
+        { type: '中子 (Neutron)', cls: 'td-neutron', energy: '0.025 eV (热中子峰)', integ: phys.total_n * 0.35, diff: phys.total_n * 0.012, source: '地球大气反照中子 (LEO)', see: '硼-10 (10B) 捕获反应诱发热中子翻转' },
+        { type: '中子 (Neutron)', cls: 'td-neutron', energy: '1 ~ 20 MeV (蒸发/快中子)', integ: phys.total_n * 0.55, diff: phys.total_n * 0.025, source: '机箱高能质子散裂次级产物', see: '硅原子核碰撞位移损伤与反冲核翻转' },
+
+        // Heavy Ions
+        { type: '重离子 (LET)', cls: 'td-heavy', energy: 'LET > 1 MeV·cm²/mg', integ: phys.max_let > 30 ? (phys.isDeep ? 6800 : 3500) : 450, diff: '-', source: '银河宇宙线 (GCR) 碳/氧核', see: '先进深亚微米商用逻辑芯片软错误' },
+        { type: '重离子 (LET)', cls: 'td-heavy', energy: 'LET > 10 MeV·cm²/mg', integ: phys.max_let > 30 ? (phys.isDeep ? 88.0 : 38.0) : 3.2, diff: '-', source: 'GCR 硅/钙中重核', see: '宇航抗辐射加固标准测试考核门限' },
+        { type: '重离子 (LET)', cls: 'td-heavy', energy: 'LET > 37 MeV·cm²/mg', integ: phys.max_let > 37 ? (phys.isDeep ? 8.8 : 2.8) : 0.02, diff: '-', source: 'GCR 铁组核 (Fe, Z=26)', see: '商业航天 CMOS 单粒子闭锁 (SEL) 主导元凶' },
+        { type: '重离子 (LET)', cls: 'td-heavy', energy: 'LET > 75 MeV·cm²/mg', integ: phys.max_let > 75 ? (phys.isDeep ? 1.2 : 0.25) : 0, diff: '-', source: '超重宇宙线核 (Z ≥ 30)', see: '宇航绝对抗锁门限；大功率器件单粒子烧毁(SEB)' }
+      ];
+
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="${r.cls}">${r.type}</td>
+          <td>${r.energy}</td>
+          <td class="td-num">${typeof r.integ === 'number' ? formatSci(r.integ) : r.integ}</td>
+          <td class="td-num" style="color: #94A3B8;">${typeof r.diff === 'number' ? formatSci(r.diff) : r.diff}</td>
+          <td style="color: #94A3B8;">${r.source}</td>
+          <td style="color: #CBD5E1;">${r.see}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // High-Reliability Chart Renderer
+    function renderChart() {
+      const canvas = document.getElementById('chartCanvas');
+      if (!canvas) return;
+      const box = document.getElementById('canvasBox');
+      const ctx = canvas.getContext('2d');
+
+      // Guarantee robust dimension retrieval
+      let w = box.clientWidth || canvas.clientWidth || 800;
+      let h = box.clientHeight || canvas.clientHeight || 420;
+      if (w < 400) w = 800;
+      if (h < 250) h = 420;
+
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.resetTransform ? ctx.resetTransform() : ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+
+      // Clear Canvas
+      ctx.fillStyle = '#040810';
+      ctx.fillRect(0, 0, w, h);
+
+      // Chart Padding
+      const padL = 75;
+      const padR = 30;
+      const padT = 25;
+      const padB = 45;
+      const plotW = Math.max(100, w - padL - padR);
+      const plotH = Math.max(100, h - padT - padB);
+
+      const phys = calculatePhysics(currentOrbit);
+
+      // Coordinate domains
+      let xLabel = "粒子动能 E (MeV)";
+      let yLabel = "粒子通量 Flux (cm⁻²·day⁻¹ / cm⁻²·s⁻¹·MeV⁻¹)";
+      let xMinLog = 0, xMaxLog = 3; // 10^0 to 10^3 MeV
+      let yMinLog = 0, yMaxLog = 10; // 10^0 to 10^10
+
+      if (currentTab === 'HEAVY_LET') {
+        xLabel = "硅中线性能量转移 LET (MeV·cm²/mg)";
+        yLabel = "积分重离子注量 Φ(>LET) [cm⁻²·day⁻¹]";
+        xMinLog = -0.5; // ~0.3
+        xMaxLog = 2.0;  // 100
+        yMinLog = -2;   // 10^-2
+        yMaxLog = 5;    // 10^5
+      }
+
+      function toScreenX(logVal) {
+        return padL + ((logVal - xMinLog) / (xMaxLog - xMinLog)) * plotW;
+      }
+      function toScreenY(logVal) {
+        return padT + ((yMaxLog - logVal) / (yMaxLog - yMinLog)) * plotH;
+      }
+
+      // Draw Grid Lines
+      ctx.strokeStyle = '#152033';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i <= 6; i++) {
+        const y = padT + (plotH / 6) * i;
+        ctx.moveTo(padL, y);
+        ctx.lineTo(padL + plotW, y);
+      }
+      for (let j = 0; j <= 5; j++) {
+        const x = padL + (plotW / 5) * j;
+        ctx.moveTo(x, padT);
+        ctx.lineTo(x, padT + plotH);
+      }
+      ctx.stroke();
+
+      // Border Box
+      ctx.strokeStyle = '#1E293B';
+      ctx.strokeRect(padL, padT, plotW, plotH);
+
+      // Y-Axis Labels (Log decades)
+      ctx.fillStyle = '#64748B';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for (let i = 0; i <= 6; i++) {
+        const yVal = yMaxLog - ((yMaxLog - yMinLog) / 6) * i;
+        const y = padT + (plotH / 6) * i;
+        ctx.fillText('10^' + yVal.toFixed(0), padL - 8, y);
+      }
+
+      // X-Axis Labels
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      for (let j = 0; j <= 5; j++) {
+        const xVal = xMinLog + ((xMaxLog - xMinLog) / 5) * j;
+        const x = padL + (plotW / 5) * j;
+        let numStr = Math.pow(10, xVal);
+        if (numStr >= 1000) numStr = numStr.toFixed(0);
+        else if (numStr >= 10) numStr = numStr.toFixed(0);
+        else if (numStr >= 1) numStr = numStr.toFixed(1);
+        else numStr = numStr.toFixed(2);
+        ctx.fillText(numStr, x, padT + plotH + 8);
+      }
+
+      // Axis Titles
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '11px sans-serif';
+      ctx.fillText(xLabel, padL + plotW / 2, padT + plotH + 26);
+
+      ctx.save();
+      ctx.translate(18, padT + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(yLabel, 0, 0);
+      ctx.restore();
+
+      // Read toggles
+      const showDiff = document.getElementById('chkDiff') ? document.getElementById('chkDiff').checked : true;
+      const showInteg = document.getElementById('chkInteg') ? document.getElementById('chkInteg').checked : true;
+
+      const legend = document.getElementById('chartLegend');
+      legend.innerHTML = '';
+
+      // --- 1. PROTON CURVES ---
+      if (currentTab === 'PROTON' || currentTab === 'ALL') {
+        if (showInteg) {
+          // Proton Integral Φ(>E)
+          ctx.strokeStyle = '#00F0FF';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          for (let step = 0; step <= 100; step++) {
+            const logE = xMinLog + (xMaxLog - xMinLog) * (step / 100);
+            const E = Math.pow(10, logE);
+            let f = (phys.p30 * 2.5) * Math.exp(-E / 55);
+            if (E < phys.proton_cutoff_E) f *= Math.exp(-(phys.proton_cutoff_E - E) / 8);
+            f += 1.5e5; // GCR baseline
+            const logF = Math.max(yMinLog, Math.min(yMaxLog, Math.log10(Math.max(1, f))));
+            const sx = toScreenX(logE);
+            const sy = toScreenY(logF);
+            if (step === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+          }
+          ctx.stroke();
+          legend.innerHTML += `<div class="legend-item"><span class="legend-color" style="background: #00F0FF;"></span><span style="color: #00F0FF;">质子积分注量谱 Φ(>E)</span></div>`;
+        }
+
+        if (showDiff) {
+          // Proton Differential dΦ/dE
+          ctx.strokeStyle = '#38BDF8';
+          ctx.lineWidth = 1.8;
+          ctx.setLineDash([5, 3]);
+          ctx.beginPath();
+          for (let step = 0; step <= 100; step++) {
+            const logE = xMinLog + (xMaxLog - xMinLog) * (step / 100);
+            const E = Math.pow(10, logE);
+            let diff = (phys.p30 * 0.05) * Math.exp(-E / 50) * Math.pow(E / 30, -0.6);
+            if (E < phys.proton_cutoff_E) diff *= Math.exp(-(phys.proton_cutoff_E - E) / 7);
+            const logDiff = Math.max(yMinLog, Math.min(yMaxLog, Math.log10(Math.max(1e-4, diff))));
+            const sx = toScreenX(logE);
+            const sy = toScreenY(logDiff);
+            if (step === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+          }
+          ctx.stroke();
+          ctx.setLineDash([]);
+          legend.innerHTML += `<div class="legend-item"><span class="legend-color" style="background: #38BDF8; border-top: 1px dashed #38BDF8;"></span><span style="color: #38BDF8;">质子微分动能谱 dΦ/dE</span></div>`;
+        }
+      }
+
+      // --- 2. NEUTRON CURVES ---
+      if (currentTab === 'NEUTRON' || currentTab === 'ALL') {
+        ctx.strokeStyle = '#10B981';
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        for (let step = 0; step <= 100; step++) {
+          const logE = xMinLog + (xMaxLog - xMinLog) * (step / 100);
+          const E = Math.pow(10, logE);
+          // 1/E thermal albedo + 1MeV evaporation peak + spallation
+          let fn = phys.total_n * (0.35 / (E + 0.05) + 0.6 * Math.exp(-Math.pow(Math.log10(E) - 0.15, 2) / 0.6));
+          const logFn = Math.max(yMinLog, Math.min(yMaxLog, Math.log10(Math.max(1e-1, fn))));
+          const sx = toScreenX(logE);
+          const sy = toScreenY(logFn);
+          if (step === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+        }
+        ctx.stroke();
+        legend.innerHTML += `<div class="legend-item"><span class="legend-color" style="background: #10B981;"></span><span style="color: #10B981;">中子复合能谱 (大气反照+散裂)</span></div>`;
+      }
+
+      // --- 3. HEAVY ION LET SPECTRUM ---
+      if (currentTab === 'HEAVY_LET' || currentTab === 'ALL') {
+        ctx.strokeStyle = '#A855F7';
+        ctx.lineWidth = 2.6;
+        ctx.beginPath();
+        for (let step = 0; step <= 100; step++) {
+          const logL = xMinLog + (xMaxLog - xMinLog) * (step / 100);
+          const L = Math.pow(10, logL);
+          let f_let = 0;
+          if (L <= phys.max_let) {
+            const base = phys.isDeep ? 6800 : (phys.h <= 1000 ? 3000 : 5000);
+            f_let = base * Math.pow(1 + L / 1.5, -2.1) * (1 - L / (phys.max_let + 1.5));
+          }
+          const logFlet = Math.max(yMinLog, Math.min(yMaxLog, Math.log10(Math.max(1e-3, f_let))));
+          const sx = toScreenX(logL);
+          const sy = toScreenY(logFlet);
+          if (step === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+        }
+        ctx.stroke();
+        legend.innerHTML += `<div class="legend-item"><span class="legend-color" style="background: #A855F7;"></span><span style="color: #A855F7;">重离子积分 LET 谱 Φ(>LET)</span></div>`;
+
+        // Draw Cutoff Vertical Line on HEAVY_LET tab
+        if (currentTab === 'HEAVY_LET') {
+          const cutX = toScreenX(Math.log10(phys.max_let));
+          ctx.strokeStyle = '#EF4444';
+          ctx.lineWidth = 1.8;
+          ctx.setLineDash([4, 3]);
+          ctx.beginPath();
+          ctx.moveTo(cutX, padT);
+          ctx.lineTo(cutX, padT + plotH);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#EF4444';
+          ctx.font = '10px sans-serif';
+          ctx.fillText(`地磁截断 LETmax=${phys.max_let.toFixed(1)}`, cutX + 6, padT + 20);
+        }
+      }
+
+      // Save geometry for interactive tooltip
+      canvas.chartGeo = { padL, padR, padT, padB, plotW, plotH, xMinLog, xMaxLog, yMinLog, yMaxLog, phys, currentTab, toScreenX, toScreenY };
+    }
+
+    // Interactive Hover Crosshairs & Tooltip
+    const canvas = document.getElementById('chartCanvas');
+    const tooltip = document.getElementById('chartTooltip');
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!canvas.chartGeo) return;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const g = canvas.chartGeo;
+
+      if (mouseX >= g.padL && mouseX <= g.padL + g.plotW && mouseY >= g.padT && mouseY <= g.padT + g.plotH) {
+        // Compute logical value
+        const logX = g.xMinLog + ((mouseX - g.padL) / g.plotW) * (g.xMaxLog - g.xMinLog);
+        const logY = g.yMaxLog - ((mouseY - g.padT) / g.plotH) * (g.yMaxLog - g.yMinLog);
+        const valX = Math.pow(10, logX);
+        const valY = Math.pow(10, logY);
+
+        tooltip.style.display = 'block';
+        tooltip.style.left = Math.min(rect.width - 200, mouseX + 15) + 'px';
+        tooltip.style.top = Math.max(10, mouseY - 45) + 'px';
+
+        if (g.currentTab === 'HEAVY_LET') {
+          tooltip.innerHTML = `<div><strong>LET:</strong> ${valX.toFixed(2)} MeV·cm²/mg</div><div><strong>注量率:</strong> ${formatSci(valY)} cm⁻²·day⁻¹</div>`;
+        } else {
+          tooltip.innerHTML = `<div><strong>能量 E:</strong> ${valX >= 10 ? valX.toFixed(1) : valX.toFixed(3)} MeV</div><div><strong>通量 Flux:</strong> ${formatSci(valY)}</div>`;
+        }
+      } else {
+        tooltip.style.display = 'none';
+      }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+    });
+
+    // CSV Exporter
+    function exportReportCSV() {
+      const phys = calculatePhysics(currentOrbit);
+      let csv = "\uFEFF"; // UTF-8 BOM for Excel
+      csv += "AeroRad-Studio 空间辐射环境与粒子能谱分析报告\r\n";
+      csv += `轨道任务名称,${currentOrbit.name}\r\n`;
+      csv += `近地点高度,${currentOrbit.perigee} km\r\n`;
+      csv += `远地点高度,${currentOrbit.apogee} km\r\n`;
+      csv += `轨道倾角,${currentOrbit.inc} °\r\n`;
+      csv += `铝屏蔽厚度,${currentOrbit.shield} mm Al (${(currentOrbit.shield*0.27).toFixed(2)} g/cm²)\r\n`;
+      csv += `地磁截止刚度 Rc,${phys.Rc.toFixed(2)} GV\r\n`;
+      csv += `重离子物理截止 LETmax,${phys.max_let.toFixed(1)} MeV·cm²/mg\r\n\r\n`;
+
+      csv += "粒子类型,能量/LET档位,日积分注量率(cm^-2·day^-1),微分通量峰值(cm^-2·s^-1·MeV^-1),主要物理来源,单粒子效应威胁\r\n";
+      const tableRows = document.querySelectorAll('#spectrumTableBody tr');
+      tableRows.forEach(tr => {
+        const cols = tr.querySelectorAll('td');
+        let rowData = [];
+        cols.forEach(td => rowData.push(`"${td.innerText.replace(/"/g, '""')}"`));
+        csv += rowData.join(',') + '\r\n';
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `AeroRad_${currentOrbit.name.replace(/[\s\(\)\/]+/g, '_')}_能谱数据.csv`;
+      link.click();
+    }
+
+    // Robust Initialization
+    function initializeApp() {
+      applyPreset('SSO_OPTICAL');
+      // Multiple trigger points to prevent race condition
+      requestAnimationFrame(() => renderChart());
+      setTimeout(() => renderChart(), 100);
+      setTimeout(() => renderChart(), 300);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+      initializeApp();
+    }
+
+    window.addEventListener('resize', () => {
+      renderChart();
+    });
+  </script>
+</body>
+</html>
